@@ -15,7 +15,10 @@ WysiHat.AdvancedToolbar = Class.create((function() {
    *  it is highly recommended that you subclass it and override methods
    *  to add custom functionality.
   **/
-  function initialize(editor) {    
+  function initialize(editor) {
+    
+    alert('woo!');
+    
     this.editor = editor;
     this.element = this.createToolbarElement();
   }

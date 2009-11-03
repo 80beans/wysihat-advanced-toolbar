@@ -1,0 +1,1 @@
+* use sprockets to pack the source to a single javascript file that can be included into a project without having to copy it to wysihat itself and sprocketizing it from there. 

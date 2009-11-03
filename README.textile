@@ -4,7 +4,7 @@ A more advanced toolbar drop-in replacement for the toolbar in "WyshiHat":http:/
 
 Nothing real yet, but expect great stuff soon! You can always "fork":http://github.com/80beans/wysihat-advanced-toolbar/fork the project if you have any great ideas already. ;)
 
-h2. Using the Advanced Toolbar
+h2. Installation
 
 We've written an "Installation Guide":http://wiki.github.com/80beans/wysihat-advanced-toolbar/installation. Any questions? Don't hesitate to "ask":http://github.com/inbox/new/jeffkreeftmeijer.
 
