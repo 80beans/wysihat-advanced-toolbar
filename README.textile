@@ -1,0 +1,16 @@
+h1. WysiHat Advanced Toolbar
+
+A more advanced toolbar drop-in replacement for the toolbar in "WyshiHat":http://github.com/josh/wysihat/.
+Nothing real yet, but expect great stuff soon! You can always "fork":http://github.com/80beans/wysihat-advanced-toolbar/fork the project if you have any great ideas already. ;)
+
+h2. Installation
+
+Installation guide coming soon.
+
+h2. Contributing
+
+Found an issue? Have a great idea? Want to help? Great! "Get in touch":http://github.com/inbox/new/jeffkreeftmeijer. Of course, pull requests are always welcome too.
+
+h2. License
+
+Copyright (c) 2009 80beans, released under the MIT license
