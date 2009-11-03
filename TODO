@@ -1,2 +1,1 @@
-0.0.1 (November 2nd, 2009) - Jeff Kreeftmeijer
-* Initial commit (copy of the original wysihat toolbar)
+* use sprockets to pack the source to a single javascript file that can be included into a project without having to copy it to wysihat itself and sprocketizing it from there. 
