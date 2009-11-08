@@ -1,12 +1,12 @@
 /** section: wysihat
- *  class WysiHat.Toolbar
+ *  class WysiHat.AdvancedToolbar
 **/
 WysiHat.AdvancedToolbar = Class.create((function() {
   /**
-   *  new WysiHat.Toolbar(editor)
+   *  new WysiHat.AdvancedToolbar(editor)
    *  - editor (WysiHat.Editor): the editor object that you want to attach to
    *
-   *  Creates a toolbar element above the editor. The WysiHat.Toolbar object
+   *  Creates a toolbar element above the editor. The WysiHat.AdvancedToolbar object
    *  has many helper methods to easily add buttons to the toolbar.
    *
    *  This toolbar class is not required for the Editor object to function.
@@ -21,7 +21,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#createToolbarElement() -> Element
+   *  WysiHat.AdvancedToolbar#createToolbarElement() -> Element
    *
    *  Creates a toolbar container element and inserts it right above the
    *  original textarea element. The element is a div with the class
@@ -38,7 +38,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#addButtonSet(set) -> undefined
+   *  WysiHat.AdvancedToolbar#addButtonSet(set) -> undefined
    *  - set (Array): The set array contains nested arrays that hold the
    *  button options, and handler.
    *
@@ -52,7 +52,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#addButton(options[, handler]) -> undefined
+   *  WysiHat.AdvancedToolbar#addButton(options[, handler]) -> undefined
    *  - options (Hash): Required options hash
    *  - handler (Function): Function to bind to the button
    *
@@ -91,7 +91,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#createButtonElement(toolbar, options) -> Element
+   *  WysiHat.AdvancedToolbar#createButtonElement(toolbar, options) -> Element
    *  - toolbar (Element): Toolbar element created by createToolbarElement
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -115,7 +115,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#buttonHandler(name, options) -> Function
+   *  WysiHat.AdvancedToolbar#buttonHandler(name, options) -> Function
    *  - name (String): Name of button command: 'bold', 'italic'
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -133,7 +133,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#observeButtonClick(element, handler) -> undefined
+   *  WysiHat.AdvancedToolbar#observeButtonClick(element, handler) -> undefined
    *  - element (Element): Button element
    *  - handler (Function): Handler function to bind to element
    *
@@ -150,7 +150,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#buttonStateHandler(name, options) -> Function
+   *  WysiHat.AdvancedToolbar#buttonStateHandler(name, options) -> Function
    *  - name (String): Name of button command: 'bold', 'italic'
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -169,7 +169,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#observeStateChanges(element, name, handler) -> undefined
+   *  WysiHat.AdvancedToolbar#observeStateChanges(element, name, handler) -> undefined
    *  - element (Element): Button element
    *  - name (String): Button name
    *  - handler (Function): State query function
@@ -190,7 +190,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#updateButtonState(element, name, state) -> undefined
+   *  WysiHat.AdvancedToolbar#updateButtonState(element, name, state) -> undefined
    *  - element (Element): Button element
    *  - name (String): Button name
    *  - state (Boolean): Whether button state is on/off
