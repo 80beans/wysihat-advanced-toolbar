@@ -1,12 +1,12 @@
 /** section: wysihat
- *  class WysiHat.Toolbar
+ *  class WysiHat.AdvancedToolbar
 **/
 WysiHat.AdvancedToolbar = Class.create((function() {
   /**
-   *  new WysiHat.Toolbar(editor)
+   *  new WysiHat.AdvancedToolbar(editor)
    *  - editor (WysiHat.Editor): the editor object that you want to attach to
    *
-   *  Creates a toolbar element above the editor. The WysiHat.Toolbar object
+   *  Creates a toolbar element above the editor. The WysiHat.AdvancedToolbar object
    *  has many helper methods to easily add buttons to the toolbar.
    *
    *  This toolbar class is not required for the Editor object to function.
@@ -15,13 +15,13 @@ WysiHat.AdvancedToolbar = Class.create((function() {
    *  it is highly recommended that you subclass it and override methods
    *  to add custom functionality.
   **/
-  function initialize(editor) {    
+  function initialize(editor) {
     this.editor = editor;
     this.element = this.createToolbarElement();
   }
 
   /**
-   *  WysiHat.Toolbar#createToolbarElement() -> Element
+   *  WysiHat.AdvancedToolbar#createToolbarElement() -> Element
    *
    *  Creates a toolbar container element and inserts it right above the
    *  original textarea element. The element is a div with the class
@@ -36,9 +36,9 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.editor.insert({before: toolbar});
     return toolbar;
   }
-
+  
   /**
-   *  WysiHat.Toolbar#addButtonSet(set) -> undefined
+   *  WysiHat.AdvancedToolbar#addButtonSet(set) -> undefined
    *  - set (Array): The set array contains nested arrays that hold the
    *  button options, and handler.
    *
@@ -52,7 +52,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#addButton(options[, handler]) -> undefined
+   *  WysiHat.AdvancedToolbar#addButton(options[, handler]) -> undefined
    *  - options (Hash): Required options hash
    *  - handler (Function): Function to bind to the button
    *
@@ -87,11 +87,34 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.observeButtonClick(button, handler);
 
     var handler = this.buttonStateHandler(name, options);
-    this.observeStateChanges(button, name, handler)
+    this.observeStateChanges(button, name, handler);
+  }
+  
+  function addSelectBox(options, handler) {
+    options = $H(options);
+    
+    if (!options.get('name'))
+      options.set('name', options.get('label').toLowerCase());
+    var name = options.get('name');
+    
+    var selectBox = Element('select');
+    selectBox = this.element.appendChild(selectBox);
+    
+    options.get('options').each(function(option){
+      element = Element('option', {'class' : option});
+      element.update(option);
+      selectBox.appendChild(element);
+    });
+    
+    var handler = this.selectBoxHandler(name, options);
+    this.observeOptionSelect(selectBox, handler);
+    
+    var handler = this.buttonStateHandler(name, options);
+    this.observeStateChanges(selectBox, name, handler);
   }
 
   /**
-   *  WysiHat.Toolbar#createButtonElement(toolbar, options) -> Element
+   *  WysiHat.AdvancedToolbar#createButtonElement(toolbar, options) -> Element
    *  - toolbar (Element): Toolbar element created by createToolbarElement
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -115,7 +138,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#buttonHandler(name, options) -> Function
+   *  WysiHat.AdvancedToolbar#buttonHandler(name, options) -> Function
    *  - name (String): Name of button command: 'bold', 'italic'
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -131,9 +154,23 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       return function(editor) { editor.execCommand(name); };
   }
+  
+  function selectBoxHandler(name, options) {
+    if (options.handler)
+      return options.handler;
+    else if (options.get('handler'))
+      return options.get('handler');
+    else
+      var handlers = {};
+      options.get('options').each(function(option){
+        var handler = function(editor) { editor.execCommand(name, false, option); };
+        handlers[option] = handler;
+      });
+      return handlers;
+  }
 
   /**
-   *  WysiHat.Toolbar#observeButtonClick(element, handler) -> undefined
+   *  WysiHat.AdvancedToolbar#observeButtonClick(element, handler) -> undefined
    *  - element (Element): Button element
    *  - handler (Function): Handler function to bind to element
    *
@@ -149,8 +186,18 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     });
   }
 
+  function observeOptionSelect(element, handler) {
+    var toolbar = this;
+    element.observe('change', function(event) {
+      handler[element.value](toolbar.editor);
+      toolbar.editor.fire("wysihat:change");
+      toolbar.editor.fire("wysihat:cursormove");
+      Event.stop(event);
+    });
+  }
+
   /**
-   *  WysiHat.Toolbar#buttonStateHandler(name, options) -> Function
+   *  WysiHat.AdvancedToolbar#buttonStateHandler(name, options) -> Function
    *  - name (String): Name of button command: 'bold', 'italic'
    *  - options (Hash): Options hash that pass from addButton
    *
@@ -169,7 +216,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#observeStateChanges(element, name, handler) -> undefined
+   *  WysiHat.AdvancedToolbar#observeStateChanges(element, name, handler) -> undefined
    *  - element (Element): Button element
    *  - name (String): Button name
    *  - handler (Function): State query function
@@ -190,7 +237,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
   }
 
   /**
-   *  WysiHat.Toolbar#updateButtonState(element, name, state) -> undefined
+   *  WysiHat.AdvancedToolbar#updateButtonState(element, name, state) -> undefined
    *  - element (Element): Button element
    *  - name (String): Button name
    *  - state (Boolean): Whether button state is on/off
@@ -213,9 +260,12 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     createToolbarElement: createToolbarElement,
     addButtonSet:         addButtonSet,
     addButton:            addButton,
+    addSelectBox:         addSelectBox,
     createButtonElement:  createButtonElement,
     buttonHandler:        buttonHandler,
+    selectBoxHandler:     selectBoxHandler,
     observeButtonClick:   observeButtonClick,
+    observeOptionSelect:  observeOptionSelect,
     buttonStateHandler:   buttonStateHandler,
     observeStateChanges:  observeStateChanges,
     updateButtonState:    updateButtonState
