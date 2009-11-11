@@ -15,7 +15,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
    *  it is highly recommended that you subclass it and override methods
    *  to add custom functionality.
   **/
-  function initialize(editor) {    
+  function initialize(editor) {
     this.editor = editor;
     this.element = this.createToolbarElement();
   }
@@ -36,7 +36,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.editor.insert({before: toolbar});
     return toolbar;
   }
-
+  
   /**
    *  WysiHat.AdvancedToolbar#addButtonSet(set) -> undefined
    *  - set (Array): The set array contains nested arrays that hold the
@@ -87,7 +87,30 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.observeButtonClick(button, handler);
 
     var handler = this.buttonStateHandler(name, options);
-    this.observeStateChanges(button, name, handler)
+    this.observeStateChanges(button, name, handler);
+  }
+  
+  function addSelectBox(options, handler) {
+    options = $H(options);
+    
+    if (!options.get('name'))
+      options.set('name', options.get('label').toLowerCase());
+    var name = options.get('name');
+    
+    var selectBox = Element('select');
+    selectBox = this.element.appendChild(selectBox);
+    
+    options.get('options').each(function(option){
+      element = Element('option', {'class' : option});
+      element.update(option);
+      selectBox.appendChild(element);
+    });
+    
+    var handler = this.selectBoxHandler(name, options);
+    this.observeOptionSelect(selectBox, handler);
+    
+    var handler = this.buttonStateHandler(name, options);
+    this.observeStateChanges(selectBox, name, handler);
   }
 
   /**
@@ -131,6 +154,20 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       return function(editor) { editor.execCommand(name); };
   }
+  
+  function selectBoxHandler(name, options) {
+    if (options.handler)
+      return options.handler;
+    else if (options.get('handler'))
+      return options.get('handler');
+    else
+      var handlers = {};
+      options.get('options').each(function(option){
+        var handler = function(editor) { editor.execCommand(name, false, option); };
+        handlers[option] = handler;
+      });
+      return handlers;
+  }
 
   /**
    *  WysiHat.AdvancedToolbar#observeButtonClick(element, handler) -> undefined
@@ -143,6 +180,16 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     var toolbar = this;
     element.observe('click', function(event) {
       handler(toolbar.editor);
+      toolbar.editor.fire("wysihat:change");
+      toolbar.editor.fire("wysihat:cursormove");
+      Event.stop(event);
+    });
+  }
+
+  function observeOptionSelect(element, handler) {
+    var toolbar = this;
+    element.observe('change', function(event) {
+      handler[element.value](toolbar.editor);
       toolbar.editor.fire("wysihat:change");
       toolbar.editor.fire("wysihat:cursormove");
       Event.stop(event);
@@ -213,9 +260,12 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     createToolbarElement: createToolbarElement,
     addButtonSet:         addButtonSet,
     addButton:            addButton,
+    addSelectBox:         addSelectBox,
     createButtonElement:  createButtonElement,
     buttonHandler:        buttonHandler,
+    selectBoxHandler:     selectBoxHandler,
     observeButtonClick:   observeButtonClick,
+    observeOptionSelect:  observeOptionSelect,
     buttonStateHandler:   buttonStateHandler,
     observeStateChanges:  observeStateChanges,
     updateButtonState:    updateButtonState
