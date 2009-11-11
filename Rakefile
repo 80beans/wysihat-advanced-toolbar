@@ -11,12 +11,18 @@ task :default => :dist
 desc "Builds the distribution."
 task :dist => ["sprocketize:toolbar"]
 
+desc "Update git submodules"
+task :update_submodules do
+  system("git submodule init")
+  system("git submodule update")
+end
+
 namespace :sprocketize do
   task :dist_dir do
     FileUtils.mkdir_p(TOOLBAR_DIST_DIR)
   end
   
-  task :toolbar => [:dist_dir] do
+  task :toolbar => [:update_submodules, :dist_dir] do
     require File.join(TOOLBAR_ROOT, "vendor", "sprockets", "lib", "sprockets")
     
     secretary = Sprockets::Secretary.new(
