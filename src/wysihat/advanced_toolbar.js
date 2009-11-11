@@ -97,20 +97,13 @@ WysiHat.AdvancedToolbar = Class.create((function() {
       options.set('name', options.get('label').toLowerCase());
     var name = options.get('name');
     
-    var selectBox = Element('select');
-    selectBox = this.element.appendChild(selectBox);
-    
-    options.get('options').each(function(option){
-      element = Element('option', {'class' : option});
-      element.update(option);
-      selectBox.appendChild(element);
-    });
-    
+    var selectBox = this.createSelectboxElement(this.element, options) ;
+                  
     var handler = this.selectBoxHandler(name, options);
     this.observeOptionSelect(selectBox, handler);
     
-    var handler = this.buttonStateHandler(name, options);
-    this.observeStateChanges(selectBox, name, handler);
+    var handler = this.selectBoxStateHandler(name, options);
+    this.observeStateChangesSelectbox(selectBox, name, handler);
   }
 
   /**
@@ -135,6 +128,19 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     toolbar.appendChild(button);
 
     return button;
+  }
+  
+  function createSelectboxElement(toolbar, options) {
+    var selectbox = Element('select');    
+    options.get('options').each(function(option){
+      element = Element('option', {'class' : option});
+      element.update(option);
+      selectbox.appendChild(element);
+    });
+    
+    toolbar.appendChild(selectbox);
+    
+    return selectbox;
   }
 
   /**
@@ -214,6 +220,15 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       return function(editor) { return editor.queryCommandState(name); };
   }
+  
+  function selectBoxStateHandler(name, options) {
+    if (options.query)
+      return options.query;
+    else if (options.get('query'))
+      return options.get('query');
+    else
+      return function(editor) { return editor.getSelectedStyles().get(name); }
+  }
 
   /**
    *  WysiHat.AdvancedToolbar#observeStateChanges(element, name, handler) -> undefined
@@ -232,6 +247,18 @@ WysiHat.AdvancedToolbar = Class.create((function() {
       if (state != previousState) {
         previousState = state;
         toolbar.updateButtonState(element, name, state);
+      }
+    });
+  }
+  
+  function observeStateChangesSelectbox(element, name, handler) { 
+    var toolbar = this;
+    var previousState = false;
+    toolbar.editor.observe("wysihat:cursormove", function(event) {
+      var state = handler(toolbar.editor);
+      if (state != previousState) {
+        previousState = state;                                 
+        toolbar.updateSelectboxState(element, name, state);
       }
     });
   }
@@ -254,6 +281,10 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       element.removeClassName('selected');
   }
+  
+  function updateSelectboxState(element, name, state) {
+    alert(state);
+  }
 
   return {
     initialize:           initialize,
@@ -262,13 +293,17 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     addButton:            addButton,
     addSelectBox:         addSelectBox,
     createButtonElement:  createButtonElement,
+    createSelectboxElement:createSelectboxElement,
     buttonHandler:        buttonHandler,
     selectBoxHandler:     selectBoxHandler,
     observeButtonClick:   observeButtonClick,
     observeOptionSelect:  observeOptionSelect,
     buttonStateHandler:   buttonStateHandler,
     observeStateChanges:  observeStateChanges,
-    updateButtonState:    updateButtonState
+    updateButtonState:    updateButtonState,
+    updateSelectboxState: updateSelectboxState,
+    selectBoxStateHandler: selectBoxStateHandler,
+    observeStateChangesSelectbox: observeStateChangesSelectbox
   };
 })());
 
