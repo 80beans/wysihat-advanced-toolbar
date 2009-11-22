@@ -1,8 +1,6 @@
 h1. WysiHat Advanced Toolbar
 
-A more advanced toolbar drop-in replacement for the toolbar in "WyshiHat":http://github.com/josh/wysihat/.
-
-Nothing real yet, but expect great stuff soon! You can always "fork":http://github.com/80beans/wysihat-advanced-toolbar/fork the project if you have any great ideas already. ;)
+A more advanced toolbar drop-in replacement for the toolbar in "WyshiHat":http://github.com/josh/wysihat/. It adds an easy way to use selectboxes in the toolbar instead of just buttons. Expect more advanced features soon! You can always "fork":http://github.com/80beans/wysihat-advanced-toolbar/fork the project if you have any great ideas. :)
 
 h2. Using the Advanced Toolbar
 
