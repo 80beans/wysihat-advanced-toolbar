@@ -90,11 +90,37 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.observeStateChanges(button, name, handler);
   }
   
+  /**
+   *  WysiHat.AdvancedToolbar#addSelectbox(options[, handler]) -> undefined
+   *  - options (Hash): Required options hash
+   *  - handler (Function): Function to bind to the options
+   *
+   *  The options hash accepts two required keys, name and options. The name
+   *  value is set to the selectboxes' class. The options array will be used
+   *  as the options for the selectbox.
+   *
+   *  The second optional handler argument will be used if no handler
+   *  function is supplied in the options hash.
+   *  
+   *  toolbar.addSelectbox({
+   *    name: 'fontname',
+   *    options: [
+   *      'Times',
+   *      'Georgia',
+   *      'Arial'
+   *    ]
+   *  })
+   *
+   *  Would create a selectbox,
+   *  "<select class="fontname">
+   *    <option id="times">Times</option>
+   *    <option id="georgia">Georgia</option>
+   *    <option id="arial">Arial</option>
+   *  </select>"
+  **/
   function addSelectbox(options, handler) {
     options = $H(options);
-    
-    if (!options.get('name'))
-      options.set('name', options.get('label').toLowerCase());
+
     var name = options.get('name');
     
     var selectbox = this.createSelectboxElement(this.element, options) ;
@@ -103,7 +129,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     this.observeOptionSelect(selectbox, handler);
     
     var handler = this.selectboxStateHandler(name, options);
-    this.observeStateChangesSelectbox(selectbox, name, handler);
+    this.observeStateChangesSelectbox(handler);
   }
 
   /**
@@ -130,10 +156,21 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     return button;
   }
   
+  /**
+   *  WysiHat.AdvancedToolbar#createSelectboxElement(toolbar, options) -> Element
+   *  - toolbar (Element): Toolbar element created by createToolbarElement
+   *  - options (Hash): Options hash that pass from addButton
+   *  
+   *  Creates a selectbox element and inserts it into the toolbar container.
+  **/
   function createSelectboxElement(toolbar, options) {
-    var selectbox = Element('select');    
+    var selectbox = Element('select', {
+      'class': options.get('name')
+    });    
     options.get('options').each(function(option){
-      element = Element('option', {'id' : option});
+      element = Element('option', {
+        'id' : option.toLowerCase()
+      });
       element.update(option);
       selectbox.appendChild(element);
     });
@@ -160,7 +197,17 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       return function(editor) { editor.execCommand(name); };
   }
-  
+
+  /**
+   *  WysiHat.AdvancedToolbar#selectboxHandler(name, options) -> Function
+   *  - name (String): Name of select command: 'fontname', 'fontsize'
+   *  - options (Hash): Options hash that pass from addButton
+   *
+   *  Returns the selectbox button handler function to bind to the selectboxes'
+   *  onchange event. It checks the options for a 'handler' attribute
+   *  otherwise it defaults to a function that calls execCommand with the 
+   *  selectboxes' name and the option value.
+  **/ 
   function selectboxHandler(name, options) {
     if (options.handler)
       return options.handler;
@@ -192,6 +239,13 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     });
   }
 
+  /**
+   *  WysiHat.AdvancedToolbar#observeOptionSelect(element, handler) -> undefined
+   *  - element (Element): Selectbox option element
+   *  - handler (Function): Handler function to bind to element
+   *
+   *  Bind handler to selectboxes' onchange event.
+  **/
   function observeOptionSelect(element, handler) {
     var toolbar = this;
     element.observe('change', function(event) {
@@ -220,7 +274,17 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       return function(editor) { return editor.queryCommandState(name); };
   }
-  
+
+  /**
+   *  WysiHat.AdvancedToolbar#selectboxStateHandler(name, options) -> Function
+   *  - name (String): Name of select command: 'fontname', 'fontsize'
+   *  - options (Hash): Options hash that pass from addButton
+   *
+   *  Returns the selectbox option handler function that checks which
+   *  value is currently selected. It checks the options for a 'query'
+   *  attribute otherwise it defaults to a function that calls 
+   * queryCommandState with the selectbox option's name.
+  **/  
   function selectboxStateHandler(name, options) {
     if (options.query)
       return options.query;
@@ -251,14 +315,21 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     });
   }
   
-  function observeStateChangesSelectbox(element, name, handler) { 
+  /**
+   *  WysiHat.AdvancedToolbar#observeStateChangesSelectbox(handler) -> undefined
+   *  - handler (Function): State query function
+   *
+   *  Determines selectboxes' state by calling the query handler function then
+   *  calls updateSelectboxState.
+  **/
+  function observeStateChangesSelectbox(handler) { 
     var toolbar = this;
     var previousState = false;
     toolbar.editor.observe("wysihat:cursormove", function(event) {
       var state = handler(toolbar.editor);
       if (state != previousState) {
         previousState = state;                                 
-        toolbar.updateSelectboxState(element, name, state);
+        toolbar.updateSelectboxState(state);
       }
     });
   }
@@ -281,28 +352,34 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else
       element.removeClassName('selected');
   }
-  
-  function updateSelectboxState(element, name, state) {
-    $(state).selected = true;
+
+  /**
+   *  WysiHat.AdvancedToolbar#updateSelectboxState(state) -> undefined
+   *  - state (Boolean): The value of the selectboxes' state
+   *
+   *  Selects option for the current state.
+  **/  
+  function updateSelectboxState(state) {
+    $(state.toLowerCase()).selected = true;
   }
 
   return {
-    initialize:           initialize,
-    createToolbarElement: createToolbarElement,
-    addButtonSet:         addButtonSet,
-    addButton:            addButton,
-    addSelectbox:         addSelectbox,
-    createButtonElement:  createButtonElement,
-    createSelectboxElement:createSelectboxElement,
-    buttonHandler:        buttonHandler,
-    selectboxHandler:     selectboxHandler,
-    observeButtonClick:   observeButtonClick,
-    observeOptionSelect:  observeOptionSelect,
-    buttonStateHandler:   buttonStateHandler,
-    observeStateChanges:  observeStateChanges,
-    updateButtonState:    updateButtonState,
-    updateSelectboxState: updateSelectboxState,
-    selectboxStateHandler: selectboxStateHandler,
+    initialize:                   initialize,
+    createToolbarElement:         createToolbarElement,
+    addButtonSet:                 addButtonSet,
+    addButton:                    addButton,
+    addSelectbox:                 addSelectbox,
+    createButtonElement:          createButtonElement,
+    createSelectboxElement:       createSelectboxElement,
+    buttonHandler:                buttonHandler,
+    selectboxHandler:             selectboxHandler,
+    observeButtonClick:           observeButtonClick,
+    observeOptionSelect:          observeOptionSelect,
+    buttonStateHandler:           buttonStateHandler,
+    observeStateChanges:          observeStateChanges,
+    updateButtonState:            updateButtonState,
+    updateSelectboxState:         updateSelectboxState,
+    selectboxStateHandler:        selectboxStateHandler,
     observeStateChangesSelectbox: observeStateChangesSelectbox
   };
 })());
