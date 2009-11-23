@@ -291,7 +291,7 @@ WysiHat.AdvancedToolbar = Class.create((function() {
     else if (options.get('query'))
       return options.get('query');
     else
-      return function(editor) { return editor.getSelectedStyles().get(name); }
+      return function(editor) { return editor.getSelectedStyles().get(name); };
   }
 
   /**
